@@ -4,25 +4,22 @@ nest_asyncio.apply()
 import json
 import os
 from telegram import Update
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters
-)
+from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = 8733278270:"AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM1M"
+# BOT TOKENINGIZNI SHU YERGA QO'SHTIRNOQ ICHIGA YOZING:
+TOKEN = "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM1M"
 ADMIN_ID = 8051030380
 
 MOVIES_FILE = "movies.json"
 
 if os.path.exists(MOVIES_FILE):
     with open(MOVIES_FILE, "r") as f:
-        movies = json.load(f)
+        try:
+            movies = json.load(f)
+        except Exception:
+            movies = {}
 else:
     movies = {}
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -31,64 +28,39 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Masalan: 7"
     )
 
-
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
-        await update.message.reply_text(
-            "❌ Siz kino qo‘sha olmaysiz."
-        )
+        await update.message.reply_text("❌ Siz kino qo'sha olmaysiz.")
         return
-
     context.user_data["video_id"] = update.message.video.file_id
-
     await update.message.reply_text(
-        "✅ Video qabul qilindi!\n"
-        "Endi kino kodini yuboring. Masalan: 7"
+        "✅ Video qabul qilindi!\nEndi kino kodini yuboring. Masalan: 7"
     )
-
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
-
-    # Admin yangi kino qo‘shmoqda
-    if (
-        update.effective_user.id == ADMIN_ID
-        and "video_id" in context.user_data
-    ):
-        movies[code] = context.user_data.pop("video_id")
-
+    
+    # Admin yangi kino qo'shayotgan bo'lsa
+    if update.effective_user.id == ADMIN_ID and "video_id" in context.user_data:
+        video_id = context.user_data.pop("video_id")
+        movies[code] = video_id
         with open(MOVIES_FILE, "w") as f:
             json.dump(movies, f)
-
-        await update.message.reply_text(
-            f"✅ Kino {code} kodi bilan saqlandi!"
-        )
+        await update.message.reply_text(f"✅ Kino saqlandi! Kodu: {code}")
         return
 
-    # Foydalanuvchi kino kodini yubormoqda
+    # Foydalanuvchi kino qidirayotgan bo'lsa
     if code in movies:
-        await update.message.reply_video(
-            video=movies[code],
-            caption=f"🎬 Kino kodi: {code}"
-        )
+        await update.message.reply_video(video=movies[code], caption=f"🍿 Kino kodi: {code}")
     else:
-        await update.message.reply_text(
-            "❌ Bu koddagi kino topilmadi."
-        )
+        await update.message.reply_text("❌ Bunday kodli kino topilmadi.")
 
+def main():
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.VIDEO, handle_video))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.run_polling()
 
-app = Application.builder().token(TOKEN).build()
-
-app.add_handler(CommandHandler("start", start))
-app.add_handler(
-    MessageHandler(filters.VIDEO, handle_video)
-)
-app.add_handler(
-    MessageHandler(
-        filters.TEXT & ~filters.COMMAND,
-        handle_text
-    )
-)
-
-print("Bot ishga tushdi...")
-app.run_polling(close_loop=False)
+if name == "main":
+    main()
