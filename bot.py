@@ -3,8 +3,9 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = "8733278270:AAEAtxKCtZLVPPh50g8Q0JQC2k3hws-M3NA"
-ADMIN_ID = 8051030380
+# Token va Admin ID muhit o'zgaruvchilaridan yoki standart qiymatdan olinadi
+TOKEN = os.environ.get("BOT_TOKEN", "8733278270:AAEZbRvV8fLQSPpX-4VcXhtYicBa7KWtjT4")
+ADMIN_ID = int(os.environ.get("ADMIN_ID", "8051030380"))
 MOVIES_FILE = "movies.json"
 
 if os.path.exists(MOVIES_FILE):
