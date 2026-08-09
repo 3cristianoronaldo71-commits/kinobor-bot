@@ -6,10 +6,8 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-# BOT TOKENINGIZNI SHU YERGA QO'SHTIRNOQ ICHIGA YOZING:
-TOKEN = "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM1M"
+TOKEN = "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM"
 ADMIN_ID = 8051030380
-
 MOVIES_FILE = "movies.json"
 
 if os.path.exists(MOVIES_FILE):
@@ -23,9 +21,7 @@ else:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🎬 Salom!\n\n"
-        "Kino kodini yuboring.\n"
-        "Masalan: 7"
+        "🎬 Salom!\n\nKino kodini yuboring.\nMasalan: 7"
     )
 
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,7 +36,9 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
     
-    # Admin yangi kino qo'shayotgan bo'lsa
+    if code.startswith("/"):
+        return
+
     if update.effective_user.id == ADMIN_ID and "video_id" in context.user_data:
         video_id = context.user_data.pop("video_id")
         movies[code] = video_id
@@ -49,7 +47,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Kino saqlandi! Kodu: {code}")
         return
 
-    # Foydalanuvchi kino qidirayotgan bo'lsa
     if code in movies:
         await update.message.reply_video(video=movies[code], caption=f"🍿 Kino kodi: {code}")
     else:
@@ -59,8 +56,8 @@ def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.VIDEO, handle_video))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.add_handler(MessageHandler(filters.TEXT, handle_text))
     app.run_polling()
 
-if __name__ == "__main__":
+if name == "main":
     main()
