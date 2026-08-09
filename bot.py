@@ -1,6 +1,3 @@
-import nest_asyncio
-nest_asyncio.apply()
-
 import json
 import os
 from telegram import Update
