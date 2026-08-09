@@ -3,7 +3,7 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM"
+TOKEN = "8733278270:AAEAtxKCtZLVPPh50g8Q0JQC2k3hws-M3NA"
 ADMIN_ID = 8051030380
 MOVIES_FILE = "movies.json"
 
