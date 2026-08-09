@@ -12,7 +12,7 @@ from telegram.ext import (
     filters
 )
 
-TOKEN = os.environ["BOT_TOKEN"]
+TOKEN = 8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM1M
 ADMIN_ID = 8051030380
 
 MOVIES_FILE = "movies.json"
